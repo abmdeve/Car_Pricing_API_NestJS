@@ -7,25 +7,33 @@ import {
   Patch,
   Query,
   Delete,
+  NotFoundException,
+  UseInterceptors,
+  ClassSerializerInterceptor,
 } from '@nestjs/common';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { UsersService } from './users.service';
+import { Serialize } from '../interceptors/serialize.interceptor';
+import { UserDto } from './dtos/user.dto';
 
 @Controller('auth')
+@Serialize(UserDto)
 export class UsersController {
   constructor(private userService: UsersService) {}
 
   @Post('/signup')
   createUser(@Body() body: CreateUserDto) {
-    console.log('body ---- _______ ----', body);
     this.userService.createUser(body.email, body.password);
   }
-// auth/user/:id
+
   @Get(':id')
   findUser(@Param('id') id: string) {
-    console.log('first', id)
-    return this.userService.findOneUser(+id);
+    const user = this.userService.findOneUser(+id);
+    if (!user) {
+      throw new NotFoundException('USER NOT FOUND ON GET ONE BY ID... ');
+    }
+    return user;
   }
 
   @Get()
@@ -35,7 +43,6 @@ export class UsersController {
 
   @Delete('/delete/:id')
   removeUser(@Param('id') id: string) {
-    console.log('REMOVE THE USER ON ID IN THE CONSOLE = = =>: ', +id)
     return this.userService.removeUser(+id);
   }
 

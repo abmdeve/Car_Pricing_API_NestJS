@@ -1,4 +1,4 @@
-import { Injectable, Param } from '@nestjs/common';
+import { Injectable, Param, NotFoundException } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from './user.entity';
@@ -36,7 +36,7 @@ export class UsersService {
     const user = await this.findOneUser(id);
     // const user = await this.findOne(id);
     if (!user) {
-      throw new Error('USER NOT FOUND TO UPDATE THERE...');
+      throw new NotFoundException('USER NOT FOUND TO UPDATE THERE...');
     }
     Object.assign(user, attrs);
     return this.repo.save(user);
@@ -45,7 +45,7 @@ export class UsersService {
   async removeUser(id: number) {
     const user = await this.findOneUser(id);
     if (!user) {
-      throw new Error('USER NOT FOUND TO REMOVE THERE...');
+      throw new NotFoundException('USER NOT FOUND TO REMOVE THERE...');
     }
     return this.repo.remove(user);
   }
