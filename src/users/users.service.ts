@@ -1,29 +1,52 @@
 import { Injectable, Param } from '@nestjs/common';
-import { Repository, } from 'typeorm';
+import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from './user.entity';
 
 @Injectable()
 export class UsersService {
-    constructor( @InjectRepository(UserEntity) private repo: Repository<UserEntity>){}
-    createUser(email: string, password: string){
-        const user = this.repo.create({ email, password });
+  constructor(
+    @InjectRepository(UserEntity) private repo: Repository<UserEntity>,
+  ) {}
+  createUser(email: string, password: string) {
+    const user = this.repo.create({ email, password });
 
-        // return this.repo.save({ email, password });
-        return this.repo.save(user);
+    // return this.repo.save({ email, password });
+    return this.repo.save(user);
+  }
+
+  findOneUser(id: number) {
+    console.log(
+      'this.repo.findOne({where: {id} })',
+      this.repo.findOne({ where: { id } }),
+    );
+    return this.repo.findOne({ where: { id } });
+    // return this.repo.find({ where: { id } });
+  }
+
+  findEmail(email: string) {
+    console.log(
+      'this.repo.findOne({where: {email} })',
+      this.repo.findOne({ where: { email } }),
+    );
+    return this.repo.find({ where: { email } });
+  }
+
+  async updateUser(id: number, attrs: Partial<UserEntity>) {
+    const user = await this.findOneUser(id);
+    // const user = await this.findOne(id);
+    if (!user) {
+      throw new Error('USER NOT FOUND TO UPDATE THERE...');
     }
+    Object.assign(user, attrs);
+    return this.repo.save(user);
+  }
 
-    findOne ( id: number) {
-        return this.repo.find({where: {id}})
+  async removeUser(id: number) {
+    const user = await this.findOneUser(id);
+    if (!user) {
+      throw new Error('USER NOT FOUND TO REMOVE THERE...');
     }
-
-    find(email: string){
-        return this.repo.find({where: {email}})
-    }
-
-    update(id: number, attrs: Partial<UserEntity>){
-    }
-
-    remove(){}
+    return this.repo.remove(user);
+  }
 }
-
