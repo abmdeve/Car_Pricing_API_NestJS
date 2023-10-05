@@ -16,12 +16,10 @@ export class UsersService {
   }
 
   findOneUser(id: number) {
-    console.log(
-      'this.repo.findOne({where: {id} })',
-      this.repo.findOne({ where: { id } }),
-    );
+    if (!id) {
+      return null;
+    }
     return this.repo.findOne({ where: { id } });
-    // return this.repo.find({ where: { id } });
   }
 
   findEmail(email: string) {
